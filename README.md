@@ -17,6 +17,10 @@ Generates a HTML page for your team composition
 - [Tests](#tests)
 
 - [Video](#video)
+
+Sample generated HTML
+
+![](./images/sample.PNG)
   
 
 ## Installation
