@@ -1,5 +1,10 @@
-import inquirer from "inquirer";
-import { Enum } from './lib/Enum.js'
+const inquirer = require("inquirer");
+const HTMLParser = require('node-html-parser');
+const fs = require('fs');
+const Manager = require('./lib/Manager');
+const Engineer = require('./lib/Engineer');
+const Intern = require('./lib/Intern');
+const Enum = require('./lib/Enum');
 
 class App {
     constructor() {
@@ -65,13 +70,27 @@ class App {
                 let tempRole = response.type;
                 // add to members
                 response.type = role;
-                members.push(response);
+                
+                switch(role) {
+                    case this.memberOptions[0]:
+                        // Team Member
+                        members.push(new Manager(response.id, response.name, response.email, response.officeNum));
+                        break;
+                    case this.memberOptions[1]:
+                        // Engineer
+                        members.push(new Engineer(response.id, response.name, response.email, response.github));
+                        break;
+                    case this.memberOptions[2]:
+                        // Intern
+                        members.push(new Intern(response.id, response.name, response.email, response.school));
+                        break;
+                }
+                
                 role = tempRole;
                 
                 // If the response does matches the I don't want to add any more then finish
                 if (role === this.TeamMembersChoices.get(this.memberOptions[this.memberOptions.length - 1])) {
                     finished = true;
-                    console.log("finished");
                 }
             })
             .catch(err => {
@@ -82,13 +101,112 @@ class App {
         return members;
     }
     
+    GenerateHTML(members) {
+        // Generates the html for a list of members
+        // Read all the html files
+        let mainHTML = HTMLParser.parse(fs.readFileSync('./src/_main.html', 'utf8', (err, data) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            
+            return data;
+        }));
+        
+        let memberCard = HTMLParser.parse(fs.readFileSync('./src/_memberCard.html', 'utf8', (err, data) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            
+            return data;
+        }));
+        
+        let styling = HTMLParser.parse(fs.readFileSync('./src/_style.css', 'utf8', (err, data) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            
+            return data;
+        }));
+        
+        if (!mainHTML || !memberCard || !styling) {
+            console.log("There is a problem with the template HTML");
+        }
+        
+        let mainContainer = mainHTML.getElementById("main_container");
+        
+        // Add the memberCards for each of the members
+        members.forEach(member => {
+            // Create a copy
+            let mc = HTMLParser.parse(memberCard.toString());
+            
+            
+            mc.querySelector(".name").innerHTML = member.getName();
+            mc.querySelector(".type").innerHTML = member.getRole();
+            mc.querySelector(".member-id").innerHTML = member.getId();
+            mc.querySelector(".email").innerHTML = member.getEmail();
+            mc.querySelector(".email").setAttribute("href", `mailto: ${member.getEmail()}`);
+            
+            let officeNum = mc.querySelector(".officeNum");
+            let github = mc.querySelector(".github");
+            let school = mc.querySelector(".school");
+            let listGroup = mc.querySelector(".list-group");
+            let typeIcon = mc.querySelector(".type-icon");
+            
+            if (member.getRole() === "Manager") {
+                // Team manager
+                officeNum.innerHTML = member.getOfficeNumber();
+                typeIcon.classList.add("fa-arrows-down-to-people");
+                
+                listGroup.removeChild(github.parentNode);
+                listGroup.removeChild(school.parentNode);
+            }
+            else if (member.getRole() === this.memberOptions[1]) {
+                // Engineer
+                github.innerHTML = member.getGithub();
+                github.setAttribute("href", `https://github.com/${member.getGithub()}`);
+                typeIcon.classList.add("fa-atom");
+                
+                listGroup.removeChild(officeNum.parentNode);
+                listGroup.removeChild(school.parentNode);
+            }
+            else if (member.getRole() === this.memberOptions[2]) {
+                // Intern
+                school.innerHTML = member.getSchool();
+                typeIcon.classList.add("fa-user-graduate");
+                
+                listGroup.removeChild(officeNum.parentNode);
+                listGroup.removeChild(github.parentNode);
+            }
+            
+            mainContainer.appendChild(mc);
+        });
+        
+        // Write the HTML and CSS files
+        fs.writeFile(`./dist/${members[0].getName()}-${members[0].getId()}_members.html`, mainHTML.toString(), err => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+        });
+        
+        fs.writeFile(`./dist/style.css`, styling.toString(), err => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+        });
+    }
+    
     async start() {
         // Add the team manager first
         let teamAdd = this.TeamMembersChoices.get(this.memberOptions[0]);
         let members = await this.askQuestions(teamAdd);
+        //let members = [{'name': 'Sean', 'id': 0, 'email': 'SeanGenge@gmail.com', 'officeNum': 90019, 'type': "Team Manager"}, {'name': 'Jie', 'id': 1, 'email': 'JieMcDade@gmail.com', 'github': "seangenge", 'type': "Engineer"}];
         
-        // Create the html once we have all the members
-        
+        this.GenerateHTML(members);
     }
 }
 
