@@ -189,11 +189,14 @@ class App {
         });
         
         // Write the HTML and CSS files
-        fs.writeFile(`./dist/${members[0].getName()}-${members[0].getId()}_members.html`, mainHTML.toString(), err => {
+        const fileName = `./dist/${members[0].getName()}-${members[0].getId()}_members.html`;
+        fs.writeFile(fileName, mainHTML.toString(), err => {
             if (err) {
                 console.log(err);
                 return;
             }
+            
+            console.log(`finished generating the HTML file: ${fileName}`);
         });
         
         fs.writeFile(`./dist/style.css`, styling.toString(), err => {
@@ -201,6 +204,8 @@ class App {
                 console.log(err);
                 return;
             }
+            
+            console.log("finished generating the CSS file");
         });
     }
     
