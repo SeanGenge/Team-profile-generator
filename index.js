@@ -131,8 +131,11 @@ class App {
             return data;
         }));
         
+        // If there was an error, don't try to parse the HTML
         if (!mainHTML || !memberCard || !styling) {
             console.log("There is a problem with the template HTML");
+            
+            return;
         }
         
         let mainContainer = mainHTML.getElementById("main_container");
@@ -142,7 +145,7 @@ class App {
             // Create a copy
             let mc = HTMLParser.parse(memberCard.toString());
             
-            
+            // Add the fields to the html
             mc.querySelector(".name").innerHTML = member.getName();
             mc.querySelector(".type").innerHTML = member.getRole();
             mc.querySelector(".member-id").innerHTML = member.getId();
@@ -181,6 +184,7 @@ class App {
                 listGroup.removeChild(github.parentNode);
             }
             
+            // Add the member card to the main container
             mainContainer.appendChild(mc);
         });
         
@@ -204,7 +208,6 @@ class App {
         // Add the team manager first
         let teamAdd = this.TeamMembersChoices.get(this.memberOptions[0]);
         let members = await this.askQuestions(teamAdd);
-        //let members = [{'name': 'Sean', 'id': 0, 'email': 'SeanGenge@gmail.com', 'officeNum': 90019, 'type': "Team Manager"}, {'name': 'Jie', 'id': 1, 'email': 'JieMcDade@gmail.com', 'github': "seangenge", 'type': "Engineer"}];
         
         this.GenerateHTML(members);
     }
