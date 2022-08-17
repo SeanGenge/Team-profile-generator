@@ -47,7 +47,3 @@ To run tests, run the following command:
 ```
   npm test
 ```
-
-
-## Video
-https://watch.screencastify.com/v/VbS1WdkwYrhlfUkBhOUG
