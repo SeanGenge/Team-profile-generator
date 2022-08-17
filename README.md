@@ -3,7 +3,6 @@
 
 ## Description
 Generates a HTML page for your team composition
-  
 
 ## Table of Contents
 - [Installation](#installation)
@@ -15,8 +14,6 @@ Generates a HTML page for your team composition
 - [Contributing](#contributing)
   
 - [Tests](#tests)
-
-- [Video](#video)
 
 Sample generated HTML
 
