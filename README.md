@@ -5,6 +5,8 @@
 Generates a HTML page for your team composition
 
 ## Table of Contents
+- [Languages/Technologies used](#languagestechnologies-used)
+
 - [Installation](#installation)
   
 - [Usage](#usage)
@@ -14,6 +16,15 @@ Generates a HTML page for your team composition
 - [Contributing](#contributing)
   
 - [Tests](#tests)
+
+## Languages/Technologies used
+ - HTML
+ - CSS
+ - JavaScript
+ - Inquirer
+ - Jest
+ - fs
+ - node-html-parser
 
 Sample generated HTML
 
